@@ -11,7 +11,6 @@ export const throttle = (fn: Function, wait: number = 300) => {
     lastFn: ReturnType<typeof setTimeout>,
     lastTime: number;
   return function (this: any) {
-    console.log('run throttle')
     const context = this,
       args = arguments;
     if (!inThrottle) {

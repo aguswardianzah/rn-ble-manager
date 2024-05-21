@@ -1,16 +1,14 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from "react-native";
 import Card from "../../components/card";
 import { useBleManager } from "../../hooks/ble-manager";
-import { Colors } from "react-native/Libraries/NewAppScreen";
 import { style } from "./style";
 
 const Main = (): React.ReactNode => {
+  // get devices, status scan, and scan action from BleManager hooks
   const { devices, isScanning, startScan, stopScan } = useBleManager()
 
   const cardSeparator = useCallback(() => (<View style={style.cardSeparator} />), [])
-
-  useEffect(() => { console.log('devices', devices) }, [])
 
   const _toggleScan = useCallback(() => {
     isScanning ? stopScan() : startScan()

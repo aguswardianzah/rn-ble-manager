@@ -21,18 +21,23 @@ type BLDevice = Pick<Device, 'id' |
 export const useBleManager = () => {
   const manager = new BleManager()
   const granted = usePermission()
+  // save scanned devices
   const [devices, setDevices] = useState<BLDevice[]>([])
+  // hold scan state
   const [isScanning, setIsScanning] = useState(false)
 
   useEffect(() => {
     // return manager.destroy
   }, [granted])
 
+  // update isScanning state to true and start device scan process
   const startScan = useCallback(() => { 
     setIsScanning(true) 
     manager.startDeviceScan(
       null,
       { legacyScan: false },
+      
+      // debounce handler to prevent anr
       debounce((error: BleError | undefined, device: Device | undefined) => {
         if (error) return console.log('scan error', error)
 
@@ -41,6 +46,7 @@ export const useBleManager = () => {
     )
   }, [isScanning])
 
+  // update isScanning state to false and stop device scan process
   const stopScan = useCallback(() => { 
     setIsScanning(false) 
     manager.stopDeviceScan()
@@ -57,6 +63,7 @@ export const useBleManager = () => {
           Alert.alert(`Please turn on your device's bluetooth to start scanning`)
           break;
         case 'PoweredOn':
+          // trigger start scan if isScanning state is true
           isScanning && startScan()
           break;
       }
@@ -67,10 +74,7 @@ export const useBleManager = () => {
 
   const _onScanedDevice = useCallback((device: BLDevice) => {
     const idx = devices.findIndex(d => d.rawScanRecord === device.rawScanRecord)
-    console.log('device', device.id, device.rawScanRecord, idx)
     if (idx < 0) {
-      //   setDevices([...devices].splice(idx, 1))
-      // } else {
       setDevices([...devices, device])
     }
   }, [devices])

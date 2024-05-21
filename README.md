@@ -77,3 +77,67 @@ To learn more about React Native, take a look at the following resources:
 - [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
 - [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
 - [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+
+#  Device Scan Logic
+Device scan code located on `src/hooks/ble-manager.ts`. Trigerred by BLE Manager state and local variable
+```ts
+  // save scanned devices
+  const [devices, setDevices] = useState<BLDevice[]>([])
+  // hold scan state
+  const [isScanning, setIsScanning] = useState(false)
+
+  // update isScanning state to true and start device scan process
+  const startScan = useCallback(() => { 
+    setIsScanning(true) 
+    manager.startDeviceScan(
+      null,
+      { legacyScan: false },
+      
+      // debounce handler to prevent anr
+      debounce((error: BleError | undefined, device: Device | undefined) => {
+        if (error) return console.log('scan error', error)
+
+        device && isScanning && _onScanedDevice(device)
+      }, 500)
+    )
+  }, [isScanning])
+
+  // update isScanning state to false and stop device scan process
+  const stopScan = useCallback(() => { 
+    setIsScanning(false) 
+    manager.stopDeviceScan()
+  }, [isScanning])
+  
+  useEffect(() => {
+    const subs = manager.onStateChange((state) => {
+      switch (state) {
+        case 'Unauthorized':
+        case 'Unsupported':
+          Alert.alert(`Your device is not supported/authorized to use BluetoothLE`)
+          break;
+        case 'PoweredOff':
+          Alert.alert(`Please turn on your device's bluetooth to start scanning`)
+          break;
+        case 'PoweredOn':
+          // trigger start scan if isScanning state is true
+          isScanning && startScan()
+          break;
+      }
+    }, true)
+
+    return subs.remove
+  }, [manager, devices, isScanning])
+```
+
+# Integrating onto existing projects
+
+1. Follow the library react-native-ble-plx configuration https://www.npmjs.com/package/react-native-ble-plx#configuration--installation
+2. Copy file `src/hooks/ble-manager.ts` into your project.
+3. Copy file `src/hooks/permission.ts` to handle runtime permission (android) or implement permission request yourself. Don't forget to call check and request permission before using BLE Manager.
+4. Copy file `src/helper/index.ts` which contain throttle and debounce function and needed to handle scanning devices.
+5. example usage of scan device is at `src/screens/main/index.tsx`
+```ts
+  // get devices, status scan, and scan action from BleManager hooks
+  const { devices, isScanning, startScan, stopScan } = useBleManager()
+
+```
