@@ -131,11 +131,29 @@ Device scan code located on `src/hooks/ble-manager.ts`. Trigerred by BLE Manager
 
 # Integrating onto existing projects
 
-1. Follow the library react-native-ble-plx configuration https://www.npmjs.com/package/react-native-ble-plx#configuration--installation
-2. Copy file `src/hooks/ble-manager.ts` into your project.
-3. Copy file `src/hooks/permission.ts` to handle runtime permission (android) or implement permission request yourself. Don't forget to call check and request permission before using BLE Manager.
-4. Copy file `src/helper/index.ts` which contain throttle and debounce function and needed to handle scanning devices.
-5. example usage of scan device is at `src/screens/main/index.tsx`
+1. Copy react native module from android project `BluetoothManager.kt` and `BluetoothPackage.kt`
+2. Add module into App
+   ```
+   class MainApplication : Application(), ReactApplication {
+
+     override val reactNativeHost: ReactNativeHost =
+         object : DefaultReactNativeHost(this) {
+           override fun getPackages(): List<ReactPackage> =
+               PackageList(this).packages.apply {
+                 // Packages that cannot be autolinked yet can be added manually here, for example:
+                 // add(MyReactNativePackage())
+                 add(BluetoothPackage())
+               }
+   
+           ...
+         }
+   
+     ...
+   ``` 
+3. Copy file `src/hooks/ble-manager.ts` into your project.
+4. Copy file `src/hooks/permission.ts` to handle runtime permission (android) or implement permission request yourself. Don't forget to call check and request permission before using BLE Manager.
+5. Copy file `src/helper/index.ts` which contain throttle and debounce function and needed to handle scanning devices.
+6. example usage of scan device is at `src/screens/main/index.tsx`
 ```ts
   // get devices, status scan, and scan action from BleManager hooks
   const { devices, isScanning, startScan, stopScan } = useBleManager()
