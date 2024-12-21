@@ -1,5 +1,5 @@
 {
-  "name": "rnBleManager",
+  "name": "RN-BleManager",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -9,10 +9,17 @@
     "start": "react-native start",
     "test": "jest"
   },
+  "codegenConfig": {
+    "name": "NativeBluetoothSpec",
+    "type": "modules",
+    "jsSrcsDir": "specs",
+    "android": {
+      "javaPackageName": "com.rnblemanager"
+    }
+  },
   "dependencies": {
     "react": "18.2.0",
-    "react-native": "0.74.1",
-    "react-native-ble-plx": "^3.1.2"
+    "react-native": "0.74.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

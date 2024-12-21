@@ -1,5 +1,6 @@
 import React, { useCallback } from "react";
 import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from "react-native";
+
 import Card from "../../components/card";
 import { useBleManager } from "../../hooks/ble-manager";
 import { style } from "./style";
